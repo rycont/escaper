@@ -11,6 +11,7 @@
     "@types/file-saver": "^2.0.1",
     "@types/jszip": "^3.1.6",
     "ant-design-vue": "^1.4.8",
+    "babel-polyfill": "^6.26.0",
     "core-js": "^3.4.3",
     "file-saver": "^2.0.2",
     "jszip": "^3.2.2",
