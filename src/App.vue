@@ -139,7 +139,6 @@ export default class App extends Vue {
     this.initZip()
     message.success('성공적으로 생성되었습니다', 3)
     const { title, uri, zipper, cover, directlyOpen } = this
-    console.log(directlyOpen)
     const content = this.content(title, cover)
     zipper.file('OEBPS/content.opf', content)
     const index = this.index(uri, title, directlyOpen)
@@ -150,7 +149,6 @@ export default class App extends Vue {
         type: 'blob'
       })
       .then(e => saveAs(e, `${title}.epub`))
-    console.log(index)
   }
   content = (
     title: string,
