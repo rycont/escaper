@@ -1,5 +1,23 @@
 <template>
   <div id="app">
+    <a-card size="small" type="info">
+      <p>
+        Escaper에 오신걸 환영합니다.
+      </p>
+      <p>
+        표지의 적정 해상도는 1000x1500px입니다. 지원 포맷: PNG, JPG(기기, 뷰어에
+        따라 달라질 수 있습니다.). 표지를 넣지 않으면 각 뷰어별로 기본 이미지가
+        출력됩니다
+      </p>
+      <p>
+        URI Scheme 사용 가능합니다.
+      </p>
+      <p>
+        (페이퍼 한정) "바로 열기" 옵션은 새 창이 아닌 리디 뷰어 내부에서
+        열립니다. 저도 아직 이걸 언제 써야할지 모르겠습니다. 일반적으로는 끄고
+        사용하세요.
+      </p>
+    </a-card>
     <a-input
       addonBefore="URI"
       @input="uri = $event.target.value"
@@ -12,41 +30,68 @@
       type="text"
       placeholder="표지에 표시될 이름을 입력해주세요."
     />
-    <a-card size="small">
-      <p>
-        적정 해상도는 1000x1500px입니다. 지원 포맷: PNG, JPG(기기, 뷰어에 따라
-        달라질 수 있습니다.)
-      </p>
-    </a-card>
     <a-upload @change="onChange" :beforeUpload="returnfalse">
       <a-button> <a-icon type="upload" /> 표지 업로드 </a-button>
     </a-upload>
+    <div>
+      <a-checkbox @change="directlyOpen = $event.target.checked">
+        바로 열기 사용
+      </a-checkbox>
+    </div>
     <a-button type="primary" @click="createEpub">
       저장하기
     </a-button>
+    <a-card size="small">
+      <p>
+        아직 부족한것이 많습니다. 개발자시다면
+        <a href="https://github.com/wjdgks1224/escaper">Github Repo</a>에 기여
+        부탁드리겠습니다. PR은 환영입니다!
+      </p>
+    </a-card>
   </div>
 </template>
 
 <style>
-p {
-  margin-bottom: 0px;
-}
 body {
   margin: 0px;
+  padding-top: 80px;
+  box-sizing: border-box;
 }
 div#app {
   padding: 20px;
   max-width: 540px;
-  margin: 80px auto 0 auto;
+  margin: 0 auto 0 auto;
 }
-.ant-input-group-wrapper {
+.ant-input-group-wrapper,
+.ant-card.ant-card-bordered.ant-card-small,
+.ant-upload.ant-upload-select.ant-upload-select-text,
+.ant-checkbox-wrapper,
+.ant-btn {
   margin-bottom: 10px;
 }
-.ant-card.ant-card-bordered.ant-card-small {
-  margin-bottom: 10px;
+.ant-card {
+  border-radius: 4px;
 }
-.ant-upload.ant-upload-select.ant-upload-select-text {
-  margin-bottom: 10px;
+.ant-card-type-info {
+  background-color: rgb(230, 247, 255);
+  border: 1px solid rgb(145, 213, 255);
+  color: rgb(24, 144, 255);
+}
+.ant-card-body {
+  padding-bottom: 2px !important;
+}
+.ant-card-type-info .ant-card-body a {
+  color: #ff6f61;
+}
+@media screen and (max-width: 800px) {
+  body {
+    padding-top: 20px;
+  }
+}
+@media screen and (max-width: 540px) {
+  body {
+    padding-top: 0px;
+  }
 }
 </style>
 
@@ -54,14 +99,23 @@ div#app {
 import { Component, Vue } from 'vue-property-decorator'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
-import { Input, Upload, Button, Icon, message, Card } from 'ant-design-vue'
-;[Input, Upload, Button, Icon, Card].map(e => Vue.use(e))
+import {
+  Input,
+  Upload,
+  Button,
+  Icon,
+  message,
+  Card,
+  Checkbox
+} from 'ant-design-vue'
+;[Input, Upload, Button, Icon, Card, Checkbox].map(e => Vue.use(e))
 
 export default class App extends Vue {
-  uri: String = ''
-  title: String = ''
+  public uri: string = ''
+  title: string = ''
   coverfilename: string = ''
   coverMediaType: string = ''
+  public directlyOpen: boolean = false
   cover?: File = undefined
   zipper = new JSZip()
   onChange = ({ file }: { file: File }) => {
@@ -84,10 +138,11 @@ export default class App extends Vue {
   createEpub = () => {
     this.initZip()
     message.success('성공적으로 생성되었습니다', 3)
-    const { title, uri, zipper, cover } = this
+    const { title, uri, zipper, cover, directlyOpen } = this
+    console.log(directlyOpen)
     const content = this.content(title, cover)
     zipper.file('OEBPS/content.opf', content)
-    const index = this.index(uri, title)
+    const index = this.index(uri, title, directlyOpen)
     zipper.file('OEBPS/index.html', index)
     if (cover) zipper.file(`OEBPS/${cover.name}`, cover)
     zipper
@@ -95,9 +150,10 @@ export default class App extends Vue {
         type: 'blob'
       })
       .then(e => saveAs(e, `${title}.epub`))
+    console.log(index)
   }
   content = (
-    title: String,
+    title: string,
     cover?: File
   ) => `<?xml version="1.0" encoding="UTF-8"?>
 
@@ -129,7 +185,11 @@ export default class App extends Vue {
 	</spine>
 	<guide></guide>
 </package>`
-  index = (uri: String, title: String) => `<!DOCTYPE html>
+  index = (
+    uri: string,
+    title: string,
+    directlyOpen: boolean
+  ) => `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -143,12 +203,22 @@ export default class App extends Vue {
       border: 3px solid black;
       box-sizing: border-box;
       text-align: center;
-      line-height: 80px;
+      padding-top: 50px;
     }
   </style>
 </head>
 <body>
-  <a href="${uri}">${title}(${uri})로 이동합니다. 직접 이동</a>
+  <a id="a" href="${uri}">${title}(${uri})로 이동합니다. 직접 이동</a>
+  ${
+    directlyOpen
+      ? `<script>
+    document.getElementById('a').click()
+  ${
+    //eslint-disable-next-line
+    '<\/script>'
+  }`
+      : ''
+  }
 </body>
 </html>`
 }
