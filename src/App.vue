@@ -83,8 +83,8 @@ export default class App extends Vue {
   count: number = 0
   mounted() {
     if (!window.matchMedia('(display-mode: standalone)').matches) return
-    if (innerWidth > 540) console.log('큰 화면 디바이스!')
-    resizeTo(540, 665)
+    if (innerWidth > 540) resizeTo(540, 665)
+    
   }
   onChange({ file }: { file: File }) {
     if (!file) return
