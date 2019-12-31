@@ -26,11 +26,18 @@
       type="text"
       placeholder="표지에 표시될 이름을 입력해주세요."
     />
-    <a-upload @change="onChange" :beforeUpload="returnfalse">
-      <a-button>
-        <a-icon type="upload" />표지 업로드
-      </a-button>
-    </a-upload>
+    <a-row>
+      <a-col :span="12">
+        <a-upload @change="onChange" :beforeUpload="returnfalse">
+          <a-button>
+            <a-icon type="upload" />표지 업로드
+          </a-button>
+        </a-upload>
+      </a-col>
+      <a-col :span="12">
+        <img :src="previewData" alt />
+      </a-col>
+    </a-row>
     <div>
       <a-checkbox @change="directlyOpen = $event.target.checked">바로 열기 사용</a-checkbox>
     </div>
@@ -45,53 +52,9 @@
   </div>
 </template>
 
-<style>
-body {
-  margin: 0px;
-  padding-top: 80px;
-  box-sizing: border-box;
-}
-div#app {
-  padding: 20px;
-  max-width: 540px;
-  margin: 0 auto 0 auto;
-}
-.ant-input-group-wrapper,
-.ant-card.ant-card-bordered.ant-card-small,
-.ant-upload.ant-upload-select.ant-upload-select-text,
-.ant-checkbox-wrapper,
-.ant-btn {
-  margin-bottom: 10px;
-}
-.ant-card {
-  border-radius: 4px;
-}
-.ant-card-type-info {
-  background-color: rgb(230, 247, 255);
-  border: 1px solid rgb(145, 213, 255);
-  color: rgb(24, 144, 255);
-}
-.ant-card-body {
-  padding-bottom: 2px !important;
-}
-.ant-card-type-info .ant-card-body a {
-  color: #ff6f61;
-}
-@media screen and (max-width: 800px) {
-  body {
-    padding-top: 20px;
-  }
-}
-@media screen and (max-width: 540px) {
-  body {
-    padding-top: 0px;
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue } from 'vue-property-decorator'
-import Component, { mixins } from 'vue-class-component'
+import Component from 'vue-class-component'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import {
@@ -101,9 +64,11 @@ import {
   Icon,
   message,
   Card,
-  Checkbox
+  Checkbox,
+  Row,
+  Col
 } from 'ant-design-vue'
-;[Input, Upload, Button, Icon, Card, Checkbox].map(e => Vue.use(e))
+;[Input, Upload, Button, Icon, Card, Checkbox, Row, Col].map(e => Vue.use(e))
 
 @Component
 export default class App extends Vue {
@@ -112,16 +77,19 @@ export default class App extends Vue {
   coverfilename: string = ''
   coverMediaType: string = ''
   public directlyOpen: boolean = false
+  public previewData: string = ''
   cover?: File = undefined
   zipper = new JSZip()
+  count: number = 0
   mounted() {
     if (!window.matchMedia('(display-mode: standalone)').matches) return
-    if(innerWidth > 540) console.log('큰 화면 디바이스!')
+    if (innerWidth > 540) console.log('큰 화면 디바이스!')
     resizeTo(540, 665)
   }
-  onChange = ({ file }: { file: File }) => {
+  onChange({ file }: { file: File }) {
     if (!file) return
     this.cover = file
+    this.previewData = window.URL.createObjectURL(file)
   }
   initZip() {
     this.zipper.file('mimetype', '')
@@ -136,10 +104,11 @@ export default class App extends Vue {
     )
   }
   returnfalse = () => false
-  createEpub = () => {
+  createEpub() {
     this.initZip()
     message.success('성공적으로 생성되었습니다', 3)
     const { title, uri, zipper, cover, directlyOpen } = this
+    console.log(this)
     const content = this.content(title, cover)
     zipper.file('OEBPS/content.opf', content)
     const index = this.index(uri, title, directlyOpen)
@@ -211,14 +180,59 @@ export default class App extends Vue {
   ${
     directlyOpen
       ? `<script>
-    document.getElementById('a').click()
-  ${
-    //eslint-disable-next-line
-    '<\/script>'
-  }`
+    document.getElementById('a').click()`
       : ''
   }
 </body>
 </html>`
 }
 </script>
+
+
+<style>
+body {
+  margin: 0px;
+  padding-top: 80px;
+  box-sizing: border-box;
+}
+div#app {
+  padding: 20px;
+  max-width: 540px;
+  margin: 0 auto 0 auto;
+}
+.ant-input-group-wrapper,
+.ant-card.ant-card-bordered.ant-card-small,
+.ant-upload.ant-upload-select.ant-upload-select-text,
+.ant-checkbox-wrapper,
+.ant-btn {
+  margin-bottom: 10px;
+}
+.ant-card {
+  border-radius: 4px;
+}
+.ant-card-type-info {
+  background-color: rgb(230, 247, 255);
+  border: 1px solid rgb(145, 213, 255);
+  color: rgb(24, 144, 255);
+}
+.ant-card-body {
+  padding-bottom: 2px !important;
+}
+.ant-card-type-info .ant-card-body a {
+  color: #ff6f61;
+}
+img {
+  width: 100%;
+  border-radius: 12px;
+}
+@media screen and (max-width: 800px) {
+  body {
+    padding-top: 20px;
+  }
+}
+@media screen and (max-width: 540px) {
+  body {
+    padding-top: 0px;
+  }
+}
+</style>
