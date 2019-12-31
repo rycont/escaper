@@ -106,9 +106,18 @@ export default class App extends Vue {
   returnfalse = () => false
   createEpub() {
     this.initZip()
-    message.success('성공적으로 생성되었습니다', 3)
     const { title, uri, zipper, cover, directlyOpen } = this
-    console.log(this)
+    if(!uri) {
+      message.error('URI를 입력해주세요')
+      return
+    }
+    if (!title) {
+      message.error('제목을 입력해주세요')
+      return
+    }
+    if(!cover) {
+      message.info('표지를 넣지 않으면 기본 이미지가 출력됩니다')
+    }
     const content = this.content(title, cover)
     zipper.file('OEBPS/content.opf', content)
     const index = this.index(uri, title, directlyOpen)
@@ -118,7 +127,10 @@ export default class App extends Vue {
       .generateAsync({
         type: 'blob'
       })
-      .then(e => saveAs(e, `${title}.epub`))
+      .then(e => {
+        saveAs(e, `${title}.epub`)
+        message.success('성공적으로 생성되었습니다', 3)
+      })
   }
   content = (
     title: string,
