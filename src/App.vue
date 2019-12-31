@@ -1,17 +1,13 @@
 <template>
   <div id="app">
     <a-card size="small" type="info">
-      <p>
-        Escaper에 오신걸 환영합니다.
-      </p>
+      <p>Escaper에 오신걸 환영합니다.</p>
       <p>
         표지의 적정 해상도는 1000x1500px입니다. 지원 포맷: PNG, JPG(기기, 뷰어에
         따라 달라질 수 있습니다.). 표지를 넣지 않으면 각 뷰어별로 기본 이미지가
         출력됩니다
       </p>
-      <p>
-        URI Scheme 사용 가능합니다.
-      </p>
+      <p>URI Scheme 사용 가능합니다.</p>
       <p>
         (페이퍼 한정) "바로 열기" 옵션은 새 창이 아닌 리디 뷰어 내부에서
         열립니다. 저도 아직 이걸 언제 써야할지 모르겠습니다. 일반적으로는 끄고
@@ -31,16 +27,14 @@
       placeholder="표지에 표시될 이름을 입력해주세요."
     />
     <a-upload @change="onChange" :beforeUpload="returnfalse">
-      <a-button> <a-icon type="upload" /> 표지 업로드 </a-button>
+      <a-button>
+        <a-icon type="upload" />표지 업로드
+      </a-button>
     </a-upload>
     <div>
-      <a-checkbox @change="directlyOpen = $event.target.checked">
-        바로 열기 사용
-      </a-checkbox>
+      <a-checkbox @change="directlyOpen = $event.target.checked">바로 열기 사용</a-checkbox>
     </div>
-    <a-button type="primary" @click="createEpub">
-      저장하기
-    </a-button>
+    <a-button type="primary" @click="createEpub">저장하기</a-button>
     <a-card size="small">
       <p>
         아직 부족한것이 많습니다. 개발자시다면
@@ -96,7 +90,8 @@ div#app {
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Vue } from 'vue-property-decorator'
+import Component, { mixins } from 'vue-class-component'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import {
@@ -110,6 +105,7 @@ import {
 } from 'ant-design-vue'
 ;[Input, Upload, Button, Icon, Card, Checkbox].map(e => Vue.use(e))
 
+@Component
 export default class App extends Vue {
   public uri: string = ''
   title: string = ''
@@ -118,6 +114,11 @@ export default class App extends Vue {
   public directlyOpen: boolean = false
   cover?: File = undefined
   zipper = new JSZip()
+  mounted() {
+    if (!window.matchMedia('(display-mode: standalone)').matches) return
+    if(innerWidth > 540) console.log('큰 화면 디바이스!')
+    resizeTo(540, 665)
+  }
   onChange = ({ file }: { file: File }) => {
     if (!file) return
     this.cover = file
