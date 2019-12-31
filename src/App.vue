@@ -206,7 +206,7 @@ export default class App extends Vue {
   </style>
 </head>
 <body>
-  <a id="a" href="${uri}">${title}(${uri})로 이동합니다. 직접 이동</a>
+  <a id="a" href="${uri}">${title}(${uri})로 이동하기: [테두리 안쪽 아무 것이나 클릭하세요]</a>
   ${
     directlyOpen
       ? `<script>
