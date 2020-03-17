@@ -29,9 +29,7 @@
     <a-row>
       <a-col :span="12">
         <a-upload @change="onChange" :beforeUpload="returnfalse">
-          <a-button>
-            <a-icon type="upload" />표지 업로드
-          </a-button>
+          <a-button> <a-icon type="upload" />표지 업로드 </a-button>
         </a-upload>
       </a-col>
       <a-col :span="12">
@@ -39,7 +37,9 @@
       </a-col>
     </a-row>
     <div>
-      <a-checkbox @change="directlyOpen = $event.target.checked">바로 열기 사용</a-checkbox>
+      <a-checkbox @change="directlyOpen = $event.target.checked"
+        >바로 열기 사용</a-checkbox
+      >
     </div>
     <a-button type="primary" @click="createEpub">저장하기</a-button>
     <a-card size="small">
@@ -84,7 +84,6 @@ export default class App extends Vue {
   mounted() {
     if (!window.matchMedia('(display-mode: standalone)').matches) return
     if (innerWidth > 540) resizeTo(540, 665)
-    
   }
   onChange({ file }: { file: File }) {
     if (!file) return
@@ -107,7 +106,7 @@ export default class App extends Vue {
   createEpub() {
     this.initZip()
     const { title, uri, zipper, cover, directlyOpen } = this
-    if(!uri) {
+    if (!uri) {
       message.error('URI를 입력해주세요')
       return
     }
@@ -115,7 +114,7 @@ export default class App extends Vue {
       message.error('제목을 입력해주세요')
       return
     }
-    if(!cover) {
+    if (!cover) {
       message.info('표지를 넣지 않으면 기본 이미지가 출력됩니다')
     }
     const content = this.content(title, cover)
@@ -199,7 +198,6 @@ export default class App extends Vue {
 </html>`
 }
 </script>
-
 
 <style>
 body {
