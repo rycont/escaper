@@ -14,7 +14,7 @@
     "babel-polyfill": "^6.26.0",
     "core-js": "^3.4.3",
     "file-saver": "^2.0.2",
-    "jszip": "^3.2.2",
+    "jszip": "^3.7.0",
     "register-service-worker": "^1.6.2",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
